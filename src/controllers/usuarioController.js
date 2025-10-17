@@ -4,28 +4,99 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const criarUsuario = async (req, res) => {
-  const { nome, email, senha, tipo } = req.body;
+  const {
+    nome,
+    email,
+    senha,
+    tipo,
+    data_nascimento,
+    cpf,
+    sexo,
+    nome_mae,
+    cpf_mae,
+    nome_pai,
+    cpf_pai,
+    telefone_mae,
+    telefone_pai,
+    email_mae,
+    email_pai,
+    naturalidade,
+    cor,
+    rg,
+    id_tipo_usuario,
+    nome_responsavel_financeiro,
+    email_responsavel_financeiro,
+    fone_responsavel_financeiro,
+    nome_responsavel_pedagogico,
+    foto
+  } = req.body;
+
+  // Validações básicas
+  if (!nome || !email || !senha) {
+    return res.status(400).json({ erro: 'Nome, email e senha são obrigatórios.' });
+  }
+
+  const emailTratado = String(email).toLowerCase().trim();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(emailTratado)) {
+    return res.status(400).json({ erro: 'Email inválido.' });
+  }
+
+  if (String(senha).length < 6) {
+    return res.status(400).json({ erro: 'A senha deve ter pelo menos 6 caracteres.' });
+  }
 
   try {
+    // Verifica se já existe usuário com o email
+    const existente = await prisma.usuario.findUnique({ where: { email: emailTratado } });
+    if (existente) {
+      return res.status(409).json({ erro: 'Email já cadastrado.' });
+    }
+
     const senhaHash = await bcrypt.hash(senha, 10);
 
     const novoUsuario = await prisma.usuario.create({
       data: {
         nome,
-        email,
+        email: emailTratado,
         senha: senhaHash,
         tipo,
+        data_nascimento: data_nascimento ? new Date(data_nascimento) : null,
+        cpf,
+        sexo,
+        nome_mae,
+        cpf_mae,
+        nome_pai,
+        cpf_pai,
+        telefone_mae,
+        telefone_pai,
+        email_mae,
+        email_pai,
+        naturalidade,
+        cor,
+        rg,
+        id_tipo_usuario,
+        nome_responsavel_financeiro,
+        email_responsavel_financeiro,
+        fone_responsavel_financeiro,
+        nome_responsavel_pedagogico,
+        foto
       },
     });
 
-    res.status(201).json({ id: novoUsuario.id, nome: novoUsuario.nome, email: novoUsuario.email, tipo: novoUsuario.tipo });
+    const { senha: senhaDoBanco, ...usuarioSemSenha } = novoUsuario;
+    res.status(201).json(usuarioSemSenha);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ erro: 'Erro ao criar usuário' });
+    // Trata erro de unique constraint caso ocorra (ex: condição de corrida)
+    if (error && error.code === 'P2002') {
+      return res.status(409).json({ erro: 'Dado único já existe (provavelmente email).' });
+    }
+    res.status(500).json({ erro: 'Erro ao criar usuário.' });
   }
 };
 
-const listarUsuarios = async (req, res) => {
+const listarUsuarios = async (_req, res) => {
   try {
     const usuarios = await prisma.usuario.findMany();
     const usuariosSemSenha = usuarios.map(({ senha, ...resto }) => resto);
