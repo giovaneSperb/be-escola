@@ -1,11 +1,19 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
+}
+
+enum Cor {
+  BRANCA
+  PRETA
+  PARDA
+  AMARELA
+  INDIGENA
+  OUTRA
+}
+
+enum Sexo {
+  M
+  F
 }
 
 datasource db {
@@ -13,12 +21,38 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Usuario {
-  id        Int      @id @default(autoincrement())
-  nome      String
-  email     String   @unique
-  senha     String
-  tipo      String   // admin, professor, aluno, responsável
-  created_at DateTime @default(now())
+model TipoUsuario {
+  id       Int       @id @default(autoincrement())
+  nome     String
+  usuarios Usuario[]
 }
 
+model Usuario {
+  id                           Int          @id @default(autoincrement())
+  nome                         String
+  email                        String       @unique
+  senha                        String
+  tipo                         String
+  created_at                   DateTime     @default(now())
+  cor                          Cor?
+  cpf                          String?      @unique
+  cpf_mae                      String?
+  cpf_pai                      String?
+  data_nascimento              DateTime?
+  email_mae                    String?
+  email_pai                    String?
+  email_responsavel_financeiro String?
+  fone_responsavel_financeiro  String?
+  foto                         String?
+  id_tipo_usuario              Int?
+  naturalidade                 String?
+  nome_mae                     String?
+  nome_pai                     String?
+  nome_responsavel_financeiro  String?
+  nome_responsavel_pedagogico  String?
+  rg                           String?
+  sexo                         Sexo?
+  telefone_mae                 String?
+  telefone_pai                 String?
+  tipoUsuario                  TipoUsuario? @relation(fields: [id_tipo_usuario], references: [id])
+}

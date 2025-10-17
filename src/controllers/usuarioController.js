@@ -25,6 +25,18 @@ const criarUsuario = async (req, res) => {
   }
 };
 
+const listarUsuarios = async (req, res) => {
+  try {
+    const usuarios = await prisma.usuario.findMany();
+    const usuariosSemSenha = usuarios.map(({ senha, ...resto }) => resto);
+    res.json(usuariosSemSenha);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ erro: 'Erro ao listar usuários' });
+  }
+};
+
+
 const loginUsuario = async (req, res) => {
   const { email, senha } = req.body;
 
@@ -54,4 +66,6 @@ const loginUsuario = async (req, res) => {
   }
 };
 
-module.exports = { criarUsuario, loginUsuario };
+
+
+module.exports = { criarUsuario, loginUsuario, listarUsuarios };
