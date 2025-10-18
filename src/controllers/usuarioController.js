@@ -8,7 +8,6 @@ const criarUsuario = async (req, res) => {
     nome,
     email,
     senha,
-    tipo,
     data_nascimento,
     cpf,
     sexo,
@@ -60,7 +59,6 @@ const criarUsuario = async (req, res) => {
         nome,
         email: emailTratado,
         senha: senhaHash,
-        tipo,
         data_nascimento: data_nascimento ? new Date(data_nascimento) : null,
         cpf,
         sexo,
@@ -90,7 +88,7 @@ const criarUsuario = async (req, res) => {
     console.error(error);
     // Trata erro de unique constraint caso ocorra (ex: condição de corrida)
     if (error && error.code === 'P2002') {
-      return res.status(409).json({ erro: 'Dado único já existe (provavelmente email).' });
+      return res.status(409).json({ erro: 'Dado único já existe (provavelmente email ou CPF).' });
     }
     res.status(500).json({ erro: 'Erro ao criar usuário.' });
   }
@@ -125,12 +123,12 @@ const loginUsuario = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: usuario.id, tipo: usuario.tipo },
+      { id: usuario.id, tipo: usuario.id_tipo_usuario },
       process.env.JWT_SECRET,
       { expiresIn: '1d' }
     );
 
-    res.json({ token, usuario: { id: usuario.id, nome: usuario.nome, email: usuario.email, tipo: usuario.tipo } });
+    res.json({ token, usuario: { id: usuario.id, nome: usuario.nome, email: usuario.email, tipo: usuario.id_tipo_usuario } });
   } catch (error) {
     console.error(error);
     res.status(500).json({ erro: 'Erro ao fazer login' });
