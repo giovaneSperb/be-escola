@@ -36,7 +36,7 @@ app.post('/run-migrations', async (req, res) => {
   });
 });
 
-app.get("/run-seed", async (req, res) => {
+app.get("/run-reset", async (req, res) => {
   const secret = req.query.key;
 
   // // troque por uma variável de ambiente no Render
@@ -44,7 +44,7 @@ app.get("/run-seed", async (req, res) => {
   //   return res.status(403).json({ error: "Acesso negado" });
   // }
 
-  exec("node seed.js", (error, stdout, stderr) => {
+  exec("npx prisma migrate reset", (error, stdout, stderr) => {
     if (error) {
       console.error("Erro ao executar seed:", error);
       return res.status(500).json({ error: "Erro ao rodar seed" });
