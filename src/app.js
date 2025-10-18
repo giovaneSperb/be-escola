@@ -22,7 +22,7 @@ app.get('/', (req, res) => {
 const { exec } = require('child_process');
 
 app.post('/run-migrations', async (req, res) => {
-  exec('npx prisma generate', (error, stdout, stderr) => {
+  exec('npx prisma migrate deploy', (error, stdout, stderr) => {
     if (error) {
       console.error(`Erro: ${error.message}`);
       return res.status(500).send('Erro ao rodar migrations');
@@ -36,24 +36,6 @@ app.post('/run-migrations', async (req, res) => {
   });
 });
 
-app.get("/run-reset", async (req, res) => {
-  const secret = req.query.key;
-
-  // // troque por uma variável de ambiente no Render
-  // if (secret !== process.env.SEED_KEY) {
-  //   return res.status(403).json({ error: "Acesso negado" });
-  // }
-
-  exec("npx prisma generate", (error, stdout, stderr) => {
-    if (error) {
-      console.error("Erro ao executar seed:", error);
-      return res.status(500).json({ error: "Erro ao rodar seed" });
-    }
-
-    console.log("Seed executado:", stdout);
-    return res.json({ success: true, log: stdout });
-  });
-});
 
 // Iniciar servidor
 const PORT = process.env.PORT || 3000;
