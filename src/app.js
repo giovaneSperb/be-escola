@@ -44,7 +44,7 @@ app.get("/run-reset", async (req, res) => {
   //   return res.status(403).json({ error: "Acesso negado" });
   // }
 
-  exec("npx prisma migrate reset", (error, stdout, stderr) => {
+  exec("npx prisma migrate dev", (error, stdout, stderr) => {
     if (error) {
       console.error("Erro ao executar seed:", error);
       return res.status(500).json({ error: "Erro ao rodar seed" });
