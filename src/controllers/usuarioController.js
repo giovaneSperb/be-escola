@@ -155,11 +155,11 @@ const loginUsuario = async (req, res) => {
   const { email, senha } = req.body;
 
   try {
-    // const usuario = await prisma.usuario.findUnique({ where: { email } });
+    const usuario = await prisma.usuario.findUnique({ where: { email } });
 
-    // if (!usuario) {
-    //   return res.status(404).json({ erro: 'Usuário não encontrado' });
-    // }
+    if (!usuario) {
+      return res.status(404).json({ erro: 'Usuário não encontrado' });
+    }
 
     const senhaValida = await bcrypt.compare(senha, usuario.senha);
 
