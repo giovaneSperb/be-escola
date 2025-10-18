@@ -3,31 +3,14 @@ const prisma = new PrismaClient();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+
 const criarUsuario = async (req, res) => {
   const {
     nome,
     email,
     senha,
-    data_nascimento,
     cpf,
-    sexo,
-    nome_mae,
-    cpf_mae,
-    nome_pai,
-    cpf_pai,
-    telefone_mae,
-    telefone_pai,
-    email_mae,
-    email_pai,
-    naturalidade,
-    cor,
-    rg,
     id_tipo_usuario,
-    nome_responsavel_financeiro,
-    email_responsavel_financeiro,
-    fone_responsavel_financeiro,
-    nome_responsavel_pedagogico,
-    foto
   } = req.body;
 
   // Validações básicas
@@ -59,6 +42,70 @@ const criarUsuario = async (req, res) => {
         nome,
         email: emailTratado,
         senha: senhaHash,
+        cpf,
+        id_tipo_usuario,
+      },
+    });
+
+    const { senha: senhaDoBanco, ...usuarioSemSenha } = novoUsuario;
+    res.status(201).json(usuarioSemSenha);
+  } catch (error) {
+    console.error(error);
+    // Trata erro de unique constraint caso ocorra (ex: condição de corrida)
+    if (error && error.code === 'P2002') {
+      return res.status(409).json({ erro: 'Dado único já existe (provavelmente email ou CPF).' });
+    }
+    res.status(500).json({ erro: 'Erro ao criar usuário.' });
+  }
+};
+
+
+const criarPessoa = async (req, res) => {
+  const {
+    nome,
+    email,
+    cpf,
+    sexo,
+    nome_mae,
+    cpf_mae,
+    nome_pai,
+    cpf_pai,
+    telefone_mae,
+    telefone_pai,
+    email_mae,
+    email_pai,
+    naturalidade,
+    cor,
+    rg,
+    nome_responsavel_financeiro,
+    email_responsavel_financeiro,
+    fone_responsavel_financeiro,
+    nome_responsavel_pedagogico,
+    foto
+  } = req.body;
+
+  // Validações básicas
+  if (!nome || !email || !cpf) {
+    return res.status(400).json({ erro: 'Nome, email e Cpf são obrigatórios.' });
+  }
+
+  const emailTratado = String(email).toLowerCase().trim();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(emailTratado)) {
+    return res.status(400).json({ erro: 'Email inválido.' });
+  }
+
+  try {
+    // Verifica se já existe usuário com o email
+    const existente = await prisma.pessoa.findUnique({ where: { email: emailTratado } });
+    if (existente) {
+      return res.status(409).json({ erro: 'Email já cadastrado.' });
+    }
+
+    const novoPEssoa = await prisma.pessoa.create({
+      data: {
+        nome,
+        email: emailTratado,
         data_nascimento: data_nascimento ? new Date(data_nascimento) : null,
         cpf,
         sexo,
@@ -73,7 +120,6 @@ const criarUsuario = async (req, res) => {
         naturalidade,
         cor,
         rg,
-        id_tipo_usuario,
         nome_responsavel_financeiro,
         email_responsavel_financeiro,
         fone_responsavel_financeiro,
@@ -82,15 +128,14 @@ const criarUsuario = async (req, res) => {
       },
     });
 
-    const { senha: senhaDoBanco, ...usuarioSemSenha } = novoUsuario;
-    res.status(201).json(usuarioSemSenha);
+    res.status(201).json(novoPEssoa);
   } catch (error) {
     console.error(error);
     // Trata erro de unique constraint caso ocorra (ex: condição de corrida)
     if (error && error.code === 'P2002') {
       return res.status(409).json({ erro: 'Dado único já existe (provavelmente email ou CPF).' });
     }
-    res.status(500).json({ erro: 'Erro ao criar usuário.' });
+    res.status(500).json({ erro: 'Erro ao criar Pessoa.' });
   }
 };
 

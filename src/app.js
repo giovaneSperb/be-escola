@@ -1,6 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const fileURLToPath = require("url");
+
+const path = require("path");
 
 const usuarioRoutes = require('./routes/usuarioRoutes');
 
@@ -36,10 +39,10 @@ app.post('/run-migrations', async (req, res) => {
 app.get("/run-seed", async (req, res) => {
   const secret = req.query.key;
 
-  // troque por uma variável de ambiente no Render
-  if (secret !== process.env.SEED_KEY) {
-    return res.status(403).json({ error: "Acesso negado" });
-  }
+  // // troque por uma variável de ambiente no Render
+  // if (secret !== process.env.SEED_KEY) {
+  //   return res.status(403).json({ error: "Acesso negado" });
+  // }
 
   exec("node seed.js", (error, stdout, stderr) => {
     if (error) {
