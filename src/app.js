@@ -22,7 +22,7 @@ app.get('/', (req, res) => {
 const { exec } = require('child_process');
 
 app.post('/run-migrations', async (req, res) => {
-  exec('npx prisma migrate deploy', (error, stdout, stderr) => {
+  exec('npx prisma generate', (error, stdout, stderr) => {
     if (error) {
       console.error(`Erro: ${error.message}`);
       return res.status(500).send('Erro ao rodar migrations');
