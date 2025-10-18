@@ -7,7 +7,6 @@ async function main() {
       { nome: 'admin' },
       { nome: 'secretaria' },
       { nome: 'professor' },
-      { nome: 'aluno' },
     ],
     skipDuplicates: true, // evita erro se já existirem
   });
