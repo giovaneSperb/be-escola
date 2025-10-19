@@ -11,6 +11,7 @@ const criarUsuario = async (req, res) => {
     senha,
     cpf,
     id_tipo_usuario,
+    tipo
   } = req.body;
 
   // Validações básicas
@@ -44,6 +45,7 @@ const criarUsuario = async (req, res) => {
         senha: senhaHash,
         cpf,
         id_tipo_usuario,
+        tipo
       },
     });
 
