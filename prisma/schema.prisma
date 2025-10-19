@@ -35,7 +35,7 @@ model Usuario {
   created_at                   DateTime     @default(now())
   id_tipo_usuario              Int?
   cpf                          String?      @unique
-  tipo                         String?  
+  tipo                         String  
   tipoUsuario                  TipoUsuario? @relation(fields: [id_tipo_usuario], references: [id])
 }
 
