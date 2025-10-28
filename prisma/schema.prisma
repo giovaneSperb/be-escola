@@ -39,7 +39,70 @@ model Usuario {
   tipoUsuario                  TipoUsuario? @relation(fields: [id_tipo_usuario], references: [id])
 }
 
-model pessoa {
+model Escola {
+  id           Int          @id @default(autoincrement())
+  nome         String
+  cnpj         String?      @unique
+  endereco     String?
+  cursos       Curso[]
+  anosLetivos  AnoLetivo[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model AnoLetivo {
+  id          Int        @id @default(autoincrement())
+  ano         Int
+  ativo       Boolean    @default(false)
+  dataInicio  DateTime?
+  dataFim     DateTime?
+  escola      Escola     @relation(fields: [escolaId], references: [id])
+  escolaId    Int
+  turmas      Turma[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Curso {
+  id            Int       @id @default(autoincrement())
+  nome          String
+  modalidade    String?
+  cargaHoraria  Int?
+  escola        Escola    @relation(fields: [escolaId], references: [id])
+  escolaId      Int
+  series        Serie[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Serie {
+  id                 Int       @id @default(autoincrement())
+  nome               String
+  ordem              Int?
+  idadeRecomendada   Int?
+  curso              Curso     @relation(fields: [cursoId], references: [id])
+  cursoId            Int
+  turmas             Turma[]
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+model Turma {
+  id             Int          @id @default(autoincrement())
+  nome           String
+  turno          String?
+  sala           String?
+  capacidade     Int?
+  serie          Serie        @relation(fields: [serieId], references: [id])
+  serieId        Int
+  anoLetivo      AnoLetivo    @relation(fields: [anoLetivoId], references: [id])
+  anoLetivoId    Int
+  matriculas     Matricula[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Pessoa {
   id                           Int          @id @default(autoincrement())
   nome                         String
   email                        String       @unique
@@ -64,4 +127,19 @@ model pessoa {
   sexo                         Sexo?
   telefone_mae                 String?
   telefone_pai                 String?
+
+  Matricula Matricula[]
+}
+
+model Matricula {
+  id              Int       @id @default(autoincrement())
+  numeroChamada   Int?
+  dataMatricula   DateTime  @default(now())
+  situacao        String    @default("ativa")
+  pessoa          Pessoa    @relation(fields: [alunoId], references: [id])
+  alunoId         Int
+  turma           Turma     @relation(fields: [turmaId], references: [id])
+  turmaId         Int
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }

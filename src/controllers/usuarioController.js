@@ -140,6 +140,19 @@ const loginUsuario = async (req, res) => {
   }
 };
 
+  // ✅ Atualizar usuario
+const usuarioupdate = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { nome, email, senha, cpf, id_tipo_usuario, tipo } = req.body;
+      const usuarioAtualizado = await prisma.usuario.update({
+        where: { id: Number(id) },
+        data: { nome, email, senha, cpf, id_tipo_usuario, tipo },
+      });
+      res.json(usuarioAtualizado);
+    } catch (error) {
+      res.status(500).json({ error: "Erro ao atualizar usuario", details: error.message });
+    }
+};
 
-
-module.exports = { criarUsuario, loginUsuario, listarUsuarios, buscarUsuarioPorId };
+module.exports = { criarUsuario, loginUsuario, listarUsuarios, buscarUsuarioPorId, usuarioupdate };

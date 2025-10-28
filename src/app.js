@@ -6,6 +6,7 @@ const fileURLToPath = require("url");
 const path = require("path");
 
 const usuarioRoutes = require('./routes/usuarioRoutes');
+const escolaRoutes = require('./routes/escolaRoutes');
 
 const app = express();
 app.use(cors());
@@ -13,6 +14,7 @@ app.use(express.json());
 
 // Rotas da API
 app.use('/api', usuarioRoutes);
+app.use('/api', escolaRoutes);
 
 // Rota de teste
 app.get('/', (req, res) => {
