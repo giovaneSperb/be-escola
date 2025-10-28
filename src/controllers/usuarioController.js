@@ -65,6 +65,7 @@ const criarUsuario = async (req, res) => {
 const listarUsuarios = async (_req, res) => {
   try {
     const usuarios = await prisma.usuario.findMany({
+      where: { deleted_at: null },
       include: {
         tipoUsuario: true, // traz a relação
       },
@@ -88,7 +89,7 @@ const buscarUsuarioPorId = async (req, res) => {
     const { id } = req.params;
 
     const usuario = await prisma.usuario.findUnique({
-      where: { id: Number(id) },
+      where: { id: Number(id), deleted_at: null },
       include: {
         tipoUsuario: true,
       },
@@ -155,4 +156,26 @@ const usuarioupdate = async (req, res) => {
     }
 };
 
-module.exports = { criarUsuario, loginUsuario, listarUsuarios, buscarUsuarioPorId, usuarioupdate };
+const deletarUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const usuario = await prisma.usuario.findUnique({ where: { id: Number(id) } });
+    if (!usuario) {
+      return res.status(404).json({ erro: 'Usuário não encontrado' });
+    }
+
+    await prisma.usuario.update({
+      where: { id: Number(id) },
+      data: { deleted_at: new Date() },
+    });
+
+    res.json({ mensagem: 'Usuário marcado como excluído (soft delete)' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ erro: 'Erro ao realizar soft delete de usuário' });
+  }
+};
+
+
+module.exports = { criarUsuario, loginUsuario, listarUsuarios, buscarUsuarioPorId, usuarioupdate, deletarUsuario };

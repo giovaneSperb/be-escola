@@ -37,6 +37,7 @@ model Usuario {
   cpf                          String?      @unique
   tipo                         String?
   tipoUsuario                  TipoUsuario? @relation(fields: [id_tipo_usuario], references: [id])
+  deleted_at                   DateTime?
 }
 
 model Escola {
