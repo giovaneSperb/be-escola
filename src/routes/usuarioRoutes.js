@@ -4,6 +4,10 @@ const { criarUsuario, loginUsuario, listarUsuarios, buscarUsuarioPorId, usuariou
 const { listarTipoUsuarios } = require('../controllers/tipousuarioController');
 const verificarToken = require('../middlewares/authMiddleware');
 
+router.post('/ping', (req, res) => {
+    res.send('pong');
+});
+
 router.post('/login', loginUsuario);
 router.get('/usuarios', verificarToken, listarUsuarios); 
 router.get('/usuarios/:id', verificarToken, buscarUsuarioPorId); 
